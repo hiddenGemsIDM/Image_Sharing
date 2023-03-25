@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>Login Page</title>
+</head>
+<body>
+    <div class="container">
+        <div class="title">LOGIN</div>
+
+   <ul> 
+        <% if(messages.success) { %>
+        <li>  <%= messages.success %> </li>
+            <% } %>
+   
+  </ul>
+
+  <ul>
+        <% if(messages.error) { %>
+            <li>  <%= messages.error %> </li>
+            <% } %>
+  </ul>
+    <form action="/login" method="POST">
+        <div>
+            <input type="email" id="email" name="email" placeholder="Email" required> 
+        </div>
+        <div>
+            <input type="password" id="password" name="password" placeholder="Password" required> 
+        </div>
+        <div class="button">
+            <input type="submit" value="Login" /> 
+        </div>
+        <a href="/register">Don't have an account? Let's get you registered!</a>
+    </form>
+</body>
+</html>
