@@ -7,6 +7,7 @@ const flash = require('express-flash')
 const passport = require('passport')
 require('dotenv').config()
 const { pool } = require('./dbConfig')
+const fileUpload = require("express-fileupload");
 
 const initializePassport = require('./configPassport')
 
@@ -47,6 +48,17 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use(flash())
+
+app.use(
+  fileUpload({
+    limits: {
+      fileSize: 2000000, // Around 2MB
+    },
+    abortOnLimit: true,
+    limitHandler: fileTooBig,
+  })
+);
+
 
 app.get('/', (req, res) => {
     res.render('index')
@@ -135,7 +147,32 @@ if(password != password2) {
   })
   )
 
+  const acceptedTypes = ["image/gif", "image/jpeg", "image/png"];
 
+  app.post('/upload', async (req, res) => {
+    const userID = 1;
+    const image = req.files.picture;
+  if (acceptedTypes.indexOf(image.mimetype) >= 0) {
+    console.log(image)
+       pool.query(`INSERT INTO public."Photo"
+       ("userID", "creationTime", likes, image, "mimeType")
+        VALUES ($1, NOW(), 0, $2, $3)`, [userID, image.data, image.mimetype], (err, results) => {
+          if(err) {
+            throw err;
+          }
+           console.log(results.rows)
+        } )
+    }
+  })
+
+  function fileTooBig(req, res, next) {
+    res.render("dashboard.ejs", {
+      name: "",
+      messages: { error: "Filesize too large" },
+    });
+  }
+
+  
 app.listen(PORT, ()=> {
     console.log("Listening...")
 })
