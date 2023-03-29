@@ -7,6 +7,7 @@ const flash = require('express-flash')
 const passport = require('passport')
 require('dotenv').config()
 const { pool } = require('./dbConfig')
+const fileUpload = require("express-fileupload");
 
 const initializePassport = require('./configPassport')
 
@@ -48,6 +49,17 @@ app.use(passport.session())
 
 app.use(flash())
 
+app.use(
+  fileUpload({
+    limits: {
+      fileSize: 2000000, // Around 2MB
+    },
+    abortOnLimit: true,
+    limitHandler: fileTooBig,
+  })
+);
+
+
 app.get('/', (req, res) => {
     res.render('index')
 })
@@ -61,7 +73,22 @@ app.get('/register', (req, res) => {
 })
 
 app.get('/dashboard', (req, res) => {
-    res.render('dashboard', {user: req.user.firstName} )
+  //res.render('dashboard', {user: req.user.firstName})
+  pool.query(
+    `SELECT "creationTime", likes, image, "mimeType"
+    FROM public."Photo"
+    ORDER BY "creationTime" DESC`, (err, results) => {
+      if(err) {
+        throw err;
+      }
+       const temp = results.rows
+        console.log(temp[1])
+        var base64EncodedStr = temp[0].image.toString("base64");
+        const temp2 = {user: req.user.firstName, data: temp[0].mimeType, img: base64EncodedStr, likes: temp[0].likes, timeStamp: temp[0].creationTime}
+        console.log(temp2)
+        res.render('dashboard', temp2)
+    }
+  )    
 })
 
 // app.get('/logout', (req, res) => {
@@ -135,7 +162,38 @@ if(password != password2) {
   })
   )
 
+  const acceptedTypes = ["image/gif", "image/jpeg", "image/png"];
 
+  app.post('/upload', async (req, res) => {
+    const userID = req.user.userID;
+    const image = req.files.picture;
+  if (acceptedTypes.indexOf(image.mimetype) >= 0) {
+    console.log(image)
+       pool.query(`INSERT INTO public."Photo"
+       ("userID", "creationTime", likes, image, "mimeType")
+        VALUES ($1, NOW(), 0, $2, $3)`, [userID, image.data, image.mimetype], (err, results) => {
+          if(err) {
+            throw err;
+          }
+           console.log(results.rows)
+        } )
+    }
+    else {
+      req.flash("error", "Uploaded image type cannot be identified")
+      res.redirect('/dashboard')
+    }
+    res.redirect('/dashboard')
+                      
+  })
+
+  function fileTooBig(req, res, next) {
+    res.render("dashboard.ejs", {
+      name: "",
+      messages: { error: "Filesize too large" },
+    });
+  }
+
+  
 app.listen(PORT, ()=> {
     console.log("Listening...")
 })
