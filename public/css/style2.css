@@ -15,16 +15,17 @@ a {
     color: black;
 }
 
-.section h1 {
-    font-size: 3em;
+.title h1 {
+    font-size: 2em;
     text-align: center;
     padding-bottom: 50px;
+    background-color: #FAFAFA;
 }
 
 .section h3 {
-    font-size: 1.5em;
     text-align: center;
 }
+
 
 section {
     background-color: #FAFAFA;
@@ -43,11 +44,24 @@ section {
 
 .container {
     background-color: #FAFAFA;
-    padding: 50px 0;
+    padding: 20px 0;
+    max-width: 400px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 30px;
+    margin: auto;
 }
 
 img {
     width: 100%;
+}
+
+.img-upload p {
+    color: #999;
+}
+
+.img-upload .icon {
+    font-size: 50px;
 }
 
 section .box .name {
@@ -67,11 +81,35 @@ div.timestamp {
     float: left;
 }
 
-.comment {
-    float: right;
+
+.comment input[type=text] {
+    width: 100%;
+    border:5px;
 }
 
+.comment input[type=button] {
+    width: 20%;
+    float: right;
+
+}
+
+.img-upload input[type=submit] {
+    width: 100%;
+    height: 40px;
+    border-radius: 40px;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    margin-top: 30px;
+    color: #fff;
+}
 
 #show {
    display: none;
+}
+
+#logout a {
+    color: linear-gradient(135deg, #71b7e6, #9b59b6);
 }
